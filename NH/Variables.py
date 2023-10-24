@@ -1,5 +1,6 @@
 import pygame
 import math
+from pygame.locals import *
 CELL_SIZE = 35
 
 WHITE = (255, 255, 255)
