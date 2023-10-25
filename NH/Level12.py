@@ -33,7 +33,7 @@ def Level12():
     endings = Doraemon.endings
     ending_check = False
     for i in range(len(endings)):
-        endings[i] = pygame.transform.scale(endings[i], (HEIGHT, WIDTH))
+        endings[i] = pygame.transform.scale(endings[i], (WIDTH, HEIGHT))
     running = True
     move_count = 0
     screen.fill(BLACK)
