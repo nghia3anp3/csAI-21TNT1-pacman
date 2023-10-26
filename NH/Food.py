@@ -1,4 +1,4 @@
 from Variables import *
 
-dorayaki = pygame.image.load("images/dorayaki.png")
-dorayaki = pygame.transform.scale(dorayaki, (CELL_SIZE, CELL_SIZE))
+meat = pygame.image.load("images/meat.png")
+meat = pygame.transform.scale(meat, (CELL_SIZE, CELL_SIZE))
