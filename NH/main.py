@@ -73,7 +73,8 @@ def Level1():
   Level12.Level12(map_dict['Level1'][map_pos])
 
 def Level2():
-  return
+  global map_pos
+  Level12.Level12(map_dict['Level2'][map_pos])
 def Level3():
   return
 def Level4():

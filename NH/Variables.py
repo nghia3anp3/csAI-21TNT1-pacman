@@ -26,7 +26,7 @@ def read_map(filepath):
         return [pac_map, pac_pos, food, monster]
 
 map_dict = {'Level1':[read_map('Levels/level1/map1.txt'),read_map('Levels/level1/map2.txt')],
-        'Level2':[read_map('Levels/level2/map1.txt')],
+        'Level2':[read_map('Levels/level2/map1.txt'), read_map('Levels/level2/map2.txt')],
         'Level3':[],
         'Level4':[]}
 
