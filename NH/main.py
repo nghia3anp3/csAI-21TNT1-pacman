@@ -8,7 +8,9 @@
 # # Main loop
 # if __name__ == "__main__":
 #     Level12.Level12()
+import State
 import Level12
+import Level4_play
 from Variables import *
 import pygame, sys
 from Button import Button
@@ -59,9 +61,9 @@ def play():
           Level1()
         if PLAY_LEVEL2.checkForInput(PLAY_MOUSE_POS):
           Level2()
-        if PLAY_LEVEL2.checkForInput(PLAY_MOUSE_POS):
-          Level3()
         if PLAY_LEVEL3.checkForInput(PLAY_MOUSE_POS):
+          Level3()
+        if PLAY_LEVEL4.checkForInput(PLAY_MOUSE_POS):
           Level4()
         if PLAY_BACK.checkForInput(PLAY_MOUSE_POS):
           main_menu()
@@ -71,13 +73,13 @@ def play():
 def Level1():
   global map_pos
   Level12.Level12(map_dict['Level1'][map_pos])
-
 def Level2():
   return
 def Level3():
   return
 def Level4():
-  return
+  global map_pos
+  Level4_play.Level4_play(map_dict['Level4'][0])
 def options():
   global map_pos
   while True:
@@ -146,7 +148,7 @@ def main_menu():
     for event in pygame.event.get():
       if event.type == pygame.QUIT:
         pygame.quit()
-        sys.exit()
+        sys.exit()  
       if event.type == pygame.MOUSEBUTTONDOWN:
         if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
           play()
