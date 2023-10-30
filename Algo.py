@@ -1,6 +1,7 @@
 from Variables import *
 import math
 
+#Tao class Node, chua (x,y) : toa do, parent : Node cha, g = path cost, h = heuristic, voi cac thuat toan khac h = 0
 class Node:
     def __init__(self,x,y, parent, g, h) -> None:
         self.x= x
@@ -15,6 +16,7 @@ def key_function(node:Node):
 def heuristic(start_pos, end_pos):
     return abs(start_pos[0] - end_pos[0]) + abs(start_pos[1] - end_pos[1])
 
+#Tra lai path
 def reconstruct_path(node:Node):
     path = []
     while node != None:
