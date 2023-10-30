@@ -116,7 +116,8 @@ def IdentifyGoal(maze, pacman_pos, foods, monsters_node):
 
 
 
-def pre_Level3(maze_input):
+def pre_Level3(maze_in):
+    maze_input = copy.deepcopy(maze_in)
     foods = maze_input[2]
     monsters = maze_input[3]
     maze = maze_input[0]
@@ -165,6 +166,7 @@ def pre_Level3(maze_input):
 def Level3(maze_input):
     maze, pacman_path, monsters_node, monsters_path, status = pre_Level3(maze_input)
     foods = maze_input[2]
+    print(foods)
     luffy = Luffy.luffy_right
     mouse = Mouse.mouse_left
     meat = Food.meat
@@ -180,7 +182,6 @@ def Level3(maze_input):
         Map.create_map(maze_input[0], screen, CELL_SIZE)
         for food in foods:
             screen.blit(meat, (get_map_pos_y(maze, CELL_SIZE) + food[1] * CELL_SIZE, get_map_pos_x(maze, CELL_SIZE) + food[0] * CELL_SIZE))
-            pygame.display.update()
         if pacman_path[path_i] in foods:
             foods.remove(pacman_path[path_i])
         screen.blit(luffy, (get_map_pos_y(maze, CELL_SIZE) + pacman_path[path_i][1] * CELL_SIZE,
@@ -188,8 +189,8 @@ def Level3(maze_input):
         for monster_path in monsters_path[path_i]:
             screen.blit(mouse, (get_map_pos_y(maze, CELL_SIZE) + monster_path[1] * CELL_SIZE,
                                 get_map_pos_x(maze, CELL_SIZE) + monster_path[0] * CELL_SIZE))
-        time.sleep(0.2)
         pygame.display.update()
+        time.sleep(0.2)
         path_i += 1
         if (path_i == len(pacman_path)):
             running = False
