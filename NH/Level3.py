@@ -6,7 +6,7 @@ import time
 import sys
 import Map
 import Luffy
-import Mouse
+import Marine
 import Astar
 import Food
 pygame.init()
@@ -14,7 +14,7 @@ pygame.font.init()
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("PacMan")
-font = pygame.font.Font(None, 20)
+font = get_font(20)
 score = 0
 game_bg = pygame.transform.scale(pygame.image.load("images/game_bg.png"),(WIDTH,HEIGHT))
 
@@ -164,35 +164,55 @@ def pre_Level3(maze_in):
     return maze, pacman_path, monsters_node, monsters_path, "alive"
 
 def Level3(maze_input):
+    global score
     maze, pacman_path, monsters_node, monsters_path, status = pre_Level3(maze_input)
     foods = maze_input[2]
     print(foods)
     luffy = Luffy.luffy_right
-    mouse = Mouse.mouse_left
+    marines = [Marine.marine_left] * len(monsters_path[0])
     meat = Food.meat
     running = True
     move_count = 0
     screen.blit(game_bg, (0, 0))
     path_i = 0
+    victory_check = False
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-        screen.blit(game_bg, (0, 0))
-        Map.create_map(maze_input[0], screen, CELL_SIZE)
-        for food in foods:
-            screen.blit(meat, (get_map_pos_y(maze, CELL_SIZE) + food[1] * CELL_SIZE, get_map_pos_x(maze, CELL_SIZE) + food[0] * CELL_SIZE))
-        if pacman_path[path_i] in foods:
-            foods.remove(pacman_path[path_i])
-        screen.blit(luffy, (get_map_pos_y(maze, CELL_SIZE) + pacman_path[path_i][1] * CELL_SIZE,
-                            get_map_pos_x(maze, CELL_SIZE) + pacman_path[path_i][0] * CELL_SIZE))
-        for monster_path in monsters_path[path_i]:
-            screen.blit(mouse, (get_map_pos_y(maze, CELL_SIZE) + monster_path[1] * CELL_SIZE,
-                                get_map_pos_x(maze, CELL_SIZE) + monster_path[0] * CELL_SIZE))
-        pygame.display.update()
-        time.sleep(0.2)
-        path_i += 1
-        if (path_i == len(pacman_path)):
-            running = False
+        if not victory_check:
+            screen.blit(game_bg, (0, 0))
+            Map.create_map(maze_input[0], screen, CELL_SIZE)
+            if pacman_path[path_i] in foods:
+                score += 20
+                foods.remove(pacman_path[path_i])
+            for food in foods:
+                screen.blit(meat, (get_map_pos_y(maze, CELL_SIZE) + food[1] * CELL_SIZE, get_map_pos_x(maze, CELL_SIZE) + food[0] * CELL_SIZE))
+            if path_i < len(pacman_path) - 1:
+                if pacman_path[path_i][1] < pacman_path[path_i + 1][1]:
+                    luffy = Luffy.luffy_right
+                elif pacman_path[path_i][1] > pacman_path[path_i + 1][1]:
+                    luffy = Luffy.luffy_left
+            screen.blit(luffy, (get_map_pos_y(maze, CELL_SIZE) + pacman_path[path_i][1] * CELL_SIZE,
+                                get_map_pos_x(maze, CELL_SIZE) + pacman_path[path_i][0] * CELL_SIZE))
+            score -= 1
+            for monster_index in range(len(monsters_path[path_i])):
+                if path_i < len(monsters_path) - 1:
+                    if monsters_path[path_i][monster_index][1] < monsters_path[path_i+1][monster_index][1]:
+                        marines[monster_index] = Marine.marine_right
+                    elif monsters_path[path_i][monster_index][1] > monsters_path[path_i+1][monster_index][1]:
+                        marines[monster_index] = Marine.marine_left
+                screen.blit(marines[monster_index], (get_map_pos_y(maze, CELL_SIZE) +monsters_path[path_i][monster_index][1] * CELL_SIZE,
+                                    get_map_pos_x(maze, CELL_SIZE) + monsters_path[path_i][monster_index][0] * CELL_SIZE))
+            text = font.render(f"Score: {score}", True, BLACK)
+            screen.blit(text, (10, 10))
+            pygame.display.update()
+            time.sleep(0.2)
+            path_i += 1
+            if foods == []:
+                victory_check = True
+        else:
+            victory_state(screen)
+            pygame.display.update()
     pygame.quit()
     sys.exit()

@@ -22,8 +22,7 @@ pygame.display.set_caption("One Piece Pacman")
 BG = pygame.transform.scale(pygame.image.load("images/Background.png"),(WIDTH,HEIGHT))
 LOGO = pygame.transform.scale(pygame.image.load("images/logo.png"),(500,300))
 map_pos = 0
-def get_font(size):  # Returns Press-Start-2P in the desired size
-  return pygame.font.Font("font/font.ttf", size)
+
 
 
 def play():

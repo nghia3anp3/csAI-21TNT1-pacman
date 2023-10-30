@@ -30,8 +30,16 @@ map_dict = {'Level1':[read_map('Levels/level1/map1.txt'),read_map('Levels/level1
         'Level3':[read_map('Levels/level3/map1.txt')],
         'Level4':[]}
 
+
 change_map_list = [read_map('Levels/level1/map1.txt')[0],read_map('Levels/level1/map2.txt')[0]]
+victory_bg = pygame.transform.scale(pygame.image.load("images/victory.png"),(WIDTH,HEIGHT))
 def get_map_pos_y(map,CELL_SIZE):
     return WIDTH // 2 - (CELL_SIZE * len(map[0]) // 2)
 def get_map_pos_x(map,CELL_SIZE):
     return HEIGHT // 2 - (CELL_SIZE * len(map) // 2)
+
+def get_font(size):  # Returns Press-Start-2P in the desired size
+  return pygame.font.Font("font/font.ttf", size)
+
+def victory_state(screen):
+    screen.blit(victory_bg, (0, 0))
