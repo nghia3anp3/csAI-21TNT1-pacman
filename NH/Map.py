@@ -1,6 +1,6 @@
 from Variables import *
 def create_map(map,screen,CELL_SIZE):
-    wall = pygame.image.load("images/wall.png")
+    wall = pygame.image.load("images/gold_wall.png")
     wall = pygame.transform.scale(wall, (CELL_SIZE, CELL_SIZE))
     for x in range(len(map)):
         for y in range(len(map[0])):

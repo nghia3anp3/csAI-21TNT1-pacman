@@ -15,8 +15,8 @@ from Variables import *
 import pygame, sys
 from Button import Button
 import Map
-pygame.init()
 
+pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("One Piece Pacman")
 
@@ -72,14 +72,18 @@ def play():
 
 def Level1():
   global map_pos
-  Level12.Level12(map_dict['Level1'][map_pos])
+  current_map = map_dict['Level1'][map_pos]
+  Level12.Level12(current_map)
 def Level2():
-  return
+  global map_pos
+  current_map=map_dict['Level2'][map_pos]
+  Level12.Level12(current_map)
 def Level3():
   return
 def Level4():
   global map_pos
-  Level4_play.Level4_play(map_dict['Level4'][0])
+  current_map = map_dict['Level4'][map_pos]
+  Level4_play.Level4_play(current_map)
 def options():
   global map_pos
   while True:
@@ -159,6 +163,5 @@ def main_menu():
           sys.exit()
 
     pygame.display.update()
-
 
 main_menu()

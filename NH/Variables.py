@@ -1,6 +1,10 @@
 import pygame
 import math
 from pygame.locals import *
+
+global current_map
+current_map = []
+
 WIDTH = 1280
 HEIGHT = 720
 CELL_SIZE = 30
@@ -28,10 +32,12 @@ def read_map(filepath):
 
 map_dict = {'Level1':[read_map('Levels/level1/map1.txt'),read_map('Levels/level1/map2.txt')],
         'Level2':[read_map('Levels/level2/map1.txt'), read_map('Levels/level1/map1.txt')],
+        'Level2':[read_map('Levels/level2/map1.txt'), read_map('Levels/level2/map2.txt')],
         'Level3':[],
-        'Level4':[read_map('Levels/level4/map1.txt'),read_map('Levels/level4/map1.txt')]}
+        'Level4':[read_map('Levels/level4/map1.txt'),read_map('Levels/level4/mapeasy.txt')]}
 
-change_map_list = [read_map('Levels/level1/map1.txt')[0],read_map('Levels/level1/map2.txt')[0]]
+change_map_list = [read_map('Levels/level4/mapeasy.txt')[0],read_map('Levels/level4/mapeasy.txt')[0]]
+
 def get_map_pos_y(map,CELL_SIZE):
     return WIDTH // 2 - (CELL_SIZE * len(map[0]) // 2)
 def get_map_pos_x(map,CELL_SIZE):
