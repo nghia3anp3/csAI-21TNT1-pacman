@@ -15,7 +15,7 @@ pygame.init()
 pygame.font.init()
 
 global max_depth
-max_depth = 3
+max_depth = 7
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("PacMan")
@@ -53,7 +53,7 @@ def alphabeta(agentList, agentIndex, depth, gameState, alpha, beta):
     if agentIndex == 0: #maximize for pacman
         depth += 1
         global value
-        value = -99999
+        value = -999999
         ghost_pos = []
         for x in agents[1:]:
             ghost_pos.append(x.get_pos())
@@ -64,6 +64,7 @@ def alphabeta(agentList, agentIndex, depth, gameState, alpha, beta):
             new_state.update(pacman, agentIndex)
             value = max(value, alphabeta(agents, 1, depth, new_state ,alpha, beta))
             alpha = max(alpha, value)
+            
             if beta <= alpha:
                 del backup_state
                 break
@@ -135,16 +136,16 @@ def Level4_play(map_input):
     mouse_path = [] 
     new_ghost_positions = [] 
     while running:
-        # print("Diem: ",init_state.get_score())
-        # for event in pygame.event.get():
-        #     if event.type == pygame.QUIT:
-        #         running = False
+        print("Diem: ",init_state.get_score())
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
         if not wining:
             state_recusive = init_state.copy()
             backup_state = init_state.copy()
             agents = init_state.getAgents()
             agent = agents[agentIndex]
-            actions = None
+            
             mouse_pos = []
             # print("Posible action {}:".format(i), PosibleActions)
             alpha = -999999
@@ -156,34 +157,44 @@ def Level4_play(map_input):
             if agentIndex==0:
                 for x in agents[1:]:
                     pos = x.get_pos()
-                    mouse_pos.append(x)
+                    mouse_pos.append(pos)
                 PosibleActions = getObservation(agent.get_pos(), wall, mouse_pos)
                 for action in PosibleActions:
                     state_recusive.update(Pacman.Pacman(action[0],action[1]), 0)
                     action_scores.append(alphabeta(agents, 1, 0, state_recusive, alpha, beta))
                     state_recusive = backup_state.copy()
+                if len(action_scores)==0:
+                    for ending in endings:
+                        screen.blit(ending, (0, 0))
+                        time.sleep(0.05)
+                        pygame.display.update()
                 max_action = max(action_scores)
+                max_indices = [index for index in range(len(action_scores)) if action_scores[index] == max_action]
+                chosenIndex = random.choice(max_indices)
+                # chosenIndex = max_indices[0]
+                # position = [PosibleActions[index] for index in range(len(action_scores))]
+                # print("Cac huong di: ", position)
+                # print("Diem chon: ", max_action)
+                res = PosibleActions[chosenIndex]
             else:
-                PosibleActions = getObservation(agent.get_pos(), wall)
-                for action in PosibleActions:
-                    state_recusive.update(Ghost.Ghost(action[0],action[1]), agentIndex)
-                    action_scores.append(alphabeta(agents, 0, 0, state_recusive, alpha, beta))
-                    state_recusive = backup_state.copy()
-                max_action = min(action_scores)
+                # PosibleActions = getObservation(agent.get_pos(), wall)
+                # for action in PosibleActions:
+                #     state_recusive.update(Ghost.Ghost(action[0],action[1]), agentIndex)
+                #     action_scores.append(alphabeta(agents, 0, 0, state_recusive, alpha, beta))
+                #     state_recusive = backup_state.copy()
+                # max_action = min(action_scores)
+                path = Astar.lv4_astar(state_recusive.map, state_recusive.pacman.get_pos(), state_recusive.list_ghost[agentIndex-1].get_pos())
+                res = path[-2]
 
+            # max_indices = [index for index in range(len(action_scores)) if action_scores[index] == max_action]
+            # chosenIndex = random.choice(max_indices)
+            # # chosenIndex = max_indices[0]
+            # position = [PosibleActions[index] for index in range(len(action_scores))]
+            # print("Cac huong di: ", position)
+            # print("Diem chon: ", max_action)
+            # res = PosibleActions[chosenIndex]
 
-            max_indices = [index for index in range(len(action_scores)) if action_scores[index] == max_action]
-            chosenIndex = random.choice(max_indices)
-            # chosenIndex = max_indices[0]
-            position = [PosibleActions[index] for index in range(len(action_scores))]
-            print("Cac huong di: ", position)
-            print("Diem chon: ", max_action)
-            res = PosibleActions[chosenIndex]
-            if len(action_scores) == 1:
-                if max_action == 999 or max_action==-999:
-                    print("you lose!")
-                    break;
-            print("Score la {}, res la {}, cua index {}: ".format(action_scores, res, agentIndex))
+            print("Score la {}, res la {}, cua index {} || ".format(action_scores, res, agentIndex))
             # cap nhat lai map
             if agentIndex == 0:
                 # print("Pacman turn: ")
@@ -197,14 +208,26 @@ def Level4_play(map_input):
                     init_state.update(Ghost.Ghost(x[0],x[1]), agentIndex)
 
             if agentIndex + 1 == numAgents:
-                screen.blit(luffy, (get_map_pos_y(map, CELL_SIZE) + luffy_path[0][1] * CELL_SIZE, get_map_pos_x(map, CELL_SIZE) + luffy_path[0][0] * CELL_SIZE))
-                for x in mouse_path:
-                    screen.blit(mouse, (get_map_pos_y(map, CELL_SIZE) + x[1] * CELL_SIZE, get_map_pos_x(map, CELL_SIZE) + x[0] * CELL_SIZE))
-                pygame.display.update()
+                init_state.repain()
                 mouse_path = []
                 luffy_path=[]
-                if (init_state.pacman.get_pos() in init_state.list_ghost):
-                    wining = True
+
+                # =======================================================
+                mouse_pos = [x.get_pos() for x in init_state.list_ghost]
+                # if (init_state.pacman.get_pos() in mouse_pos):
+                #     wining = True
+                #     print("You lose!")
+                #     break
+                # =======================================================
+                print(len(init_state.list_food))
+
+                if (len(init_state.list_food)==0):
+                    wining=True
+                    for ending in endings:
+                        screen.blit(ending, (0, 0))
+                        time.sleep(0.05)
+                        pygame.display.update()
+
             agentIndex = (agentIndex + 1) % numAgents
             time.sleep(0.1)
         else:

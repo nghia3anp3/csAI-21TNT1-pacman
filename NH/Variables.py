@@ -34,7 +34,7 @@ map_dict = {'Level1':[read_map('Levels/level1/map1.txt'),read_map('Levels/level1
         'Level2':[read_map('Levels/level2/map1.txt'), read_map('Levels/level1/map1.txt')],
         'Level2':[read_map('Levels/level2/map1.txt'), read_map('Levels/level2/map2.txt')],
         'Level3':[],
-        'Level4':[read_map('Levels/level4/map1.txt'),read_map('Levels/level4/mapeasy.txt')]}
+        'Level4':[read_map('Levels/level4/mapeasy.txt'),read_map('Levels/level4/mapeasy.txt')]}
 
 change_map_list = [read_map('Levels/level4/mapeasy.txt')[0],read_map('Levels/level4/mapeasy.txt')[0]]
 

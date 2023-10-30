@@ -1,7 +1,17 @@
 import Pacman
 import Ghost
 import Astar
+import Luffy
+import Food
+import Mouse
 from Variables import *
+
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+luffy = Luffy.luffy_right
+mouse = Mouse.mouse_left
+meat = Food.meat
+endings = Luffy.endings
+
 class State():
 
     def __init__(self, pacman, list_ghost, list_food, wall, map, score =0)->None:
@@ -11,6 +21,20 @@ class State():
         self.list_food = list_food
         self.wall = wall
         self.map = map
+
+    def repain(self):
+        map = self.map
+        mouse_list = [x.get_pos() for x in self.list_ghost]
+        food = [x for x in self.list_food]
+        pac_pos = self.pacman.get_pos()
+        screen.blit(luffy, (get_map_pos_y(map, CELL_SIZE) + pac_pos[1] * CELL_SIZE, get_map_pos_x(map, CELL_SIZE) + pac_pos[0] * CELL_SIZE))
+        for x, y in food:
+            if (x,y) not in mouse_list:
+                screen.blit(meat, (get_map_pos_y(map,CELL_SIZE)+y * CELL_SIZE,get_map_pos_x(map,CELL_SIZE)+ x * CELL_SIZE))
+        for x, y in mouse_list:
+            screen.blit(mouse, (get_map_pos_y(map,CELL_SIZE)+y * CELL_SIZE,get_map_pos_x(map,CELL_SIZE)+ x * CELL_SIZE))
+        pygame.display.update()
+        
     def copy(self):
             # Tạo bản sao của đối tượng State
         new_pacman = self.pacman  # Tạo bản sao của Pacman (tùy theo cách bạn đã triển khai lớp Pacman)
@@ -26,7 +50,7 @@ class State():
     def get_astar(self, index):
         pac_pos = self.pacman.get_pos()
         ghost_pos = self.list_ghost[index].get_pos()
-        if (Astar.astar(self.map,pac_pos,ghost_pos)==None):
+        if (Astar.lv4_astar(self.map,pac_pos,ghost_pos)==None):
             return 0
         return len(Astar.astar(self.map,pac_pos,ghost_pos))
     def update(self, new_value, index):
@@ -67,7 +91,7 @@ class State():
         return abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
     
     def get_min_distance_to_ghost(self):
-        min_distance = float('inf')
+        min_distance = 999
 
         for index in range(len(self.list_ghost)):
             distance = self.get_astar(index)
@@ -92,38 +116,35 @@ class State():
 
     def eval_state(self, agentIndex):
         pacman_pos = self.pacman.get_pos()
-        min_distance = float('inf')
-        total = 0
+        min_distance = 999
         for food_pos in self.list_food:
             distance = self.manhattanDistance(pacman_pos, food_pos)
             if distance < min_distance:
                 min_distance = distance
-            # total += distance
-        
         min_ghost_distance = self.get_min_distance_to_ghost()
         
-        if agentIndex == 0:
-            if (self.is_win()):
-                return 999
-            elif (self.is_lose()):
-                return -999
-            elif min_ghost_distance<=2:
-                return -999   
-            else:
-                return self.score
+        # if agentIndex == 0:
+        #     if (self.is_win()):
+        #         return 999
+        #     elif (self.is_lose()):
+        #         return -999
+        #     elif min_ghost_distance<=2:
+        #         return -999   
+        #     else:
+        #         return self.score
 
-        else:
-            if (self.is_win()):
-                return 999
-            elif (self.is_lose()):
-                return -999
-            elif min_ghost_distance<=2:
-                return -999 
-            else:
-                return min_ghost_distance
-        # if min_ghost_distance<=2:
-        #         return -999 
-        # return self.score + min_ghost_distance
+        # else:
+        if (self.is_win()):
+            return 99999
+        elif (self.is_lose()):
+            return -99999
+        elif min_ghost_distance<=2:
+            return -900 
+        #     else:
+        #         return min_ghost_distance
+        # if min_ghost_distance<=3:
+        #         return -999 + min_ghost_distance
+        return self.score + 2*min_ghost_distance - min_distance
     def getNumAgents(self):
         return len(self.list_ghost)+1
     
