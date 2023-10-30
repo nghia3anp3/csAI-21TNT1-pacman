@@ -77,7 +77,7 @@ def Level2_go():
   Level12.Level12(map_dict['Level2'][map_pos])
 def Level3_go():
   global map_pos
-  Level3.Level3(map_dict['Level3'][0])
+  Level3.Level3(map_dict['Level3'][map_pos])
 def Level4_go():
   return
 def options():
