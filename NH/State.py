@@ -28,6 +28,7 @@ class State():
         food = [x for x in self.list_food]
         pac_pos = self.pacman.get_pos()
         screen.blit(luffy, (get_map_pos_y(map, CELL_SIZE) + pac_pos[1] * CELL_SIZE, get_map_pos_x(map, CELL_SIZE) + pac_pos[0] * CELL_SIZE))
+
         for x, y in food:
             if (x,y) not in mouse_list:
                 screen.blit(meat, (get_map_pos_y(map,CELL_SIZE)+y * CELL_SIZE,get_map_pos_x(map,CELL_SIZE)+ x * CELL_SIZE))
@@ -92,13 +93,15 @@ class State():
     
     def get_min_distance_to_ghost(self):
         min_distance = 999
-
+        total = 0
         for index in range(len(self.list_ghost)):
             distance = self.get_astar(index)
-            if distance < min_distance:
-                min_distance = distance
+            # if distance < min_distance:
+            #     min_distance = distance
+            total += distance
 
-        return min_distance
+        # return min_distance
+        return total
     
     def get_min_distance_to_food(self):
         min_distance = float('inf')
@@ -121,6 +124,7 @@ class State():
             distance = self.manhattanDistance(pacman_pos, food_pos)
             if distance < min_distance:
                 min_distance = distance
+
         min_ghost_distance = self.get_min_distance_to_ghost()
         
         # if agentIndex == 0:
@@ -135,16 +139,17 @@ class State():
 
         # else:
         if (self.is_win()):
-            return 99999
+            return 999999999
+        # elif min_ghost_distance<=4:
+        #     return -99999 + self.score + min_ghost_distance
         elif (self.is_lose()):
-            return -99999
-        elif min_ghost_distance<=2:
-            return -900 
+            return -999999999 
         #     else:
         #         return min_ghost_distance
         # if min_ghost_distance<=3:
         #         return -999 + min_ghost_distance
-        return self.score + 2*min_ghost_distance - min_distance
+        return self.score + min_ghost_distance - 2*min_distance
+    
     def getNumAgents(self):
         return len(self.list_ghost)+1
     

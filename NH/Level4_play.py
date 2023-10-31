@@ -15,7 +15,7 @@ pygame.init()
 pygame.font.init()
 
 global max_depth
-max_depth = 7
+max_depth = 10
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("PacMan")
@@ -48,7 +48,7 @@ def alphabeta(agentList, agentIndex, depth, gameState, alpha, beta):
     new_state = gameState.copy()
     agents = new_state.getAgents()
     if new_state.is_win() or new_state.is_lose() or depth==max_depth:
-        return new_state.eval_state(agentIndex)
+        return new_state.eval_state(agentIndex)+depth
         
     if agentIndex == 0: #maximize for pacman
         depth += 1
@@ -65,35 +65,46 @@ def alphabeta(agentList, agentIndex, depth, gameState, alpha, beta):
             value = max(value, alphabeta(agents, 1, depth, new_state ,alpha, beta))
             alpha = max(alpha, value)
             
-            if beta <= alpha:
-                del backup_state
-                break
-            else:
-                del new_state
-                new_state = backup_state.copy()
-                del backup_state
+            del new_state
+            new_state = backup_state.copy()
+            del backup_state
+            # if beta <= alpha:
+            #     del backup_state
+            #     break
+            # else:
+            #     del new_state
+            #     new_state = backup_state.copy()
+            #     del backup_state
         return value
     else:
         nextAgent = agentIndex + 1
         depth += 1
         if new_state.getNumAgents() == nextAgent:
             nextAgent = 0
-        for action in getObservation(agents[agentIndex].get_pos(), new_state.wall):
-            # print("index 1 action alphabeta: ", action)
-            value = 999999
-            ghost = Ghost.Ghost(action[0],action[1])
-            backup_state = new_state.copy()
-            new_state.update(ghost, agentIndex)
-            value = min(value, alphabeta(agents, nextAgent, depth, new_state ,alpha, beta))
-            beta = min(beta, value)
-            if beta >= alpha:
-                del backup_state
-                break
-            else:
-                del new_state
-                new_state = backup_state.copy()
-                del backup_state
-
+        # for action in getObservation(agents[agentIndex].get_pos(), new_state.wall):
+        #     # print("index 1 action alphabeta: ", action)
+        value = 999999
+        #     ghost = Ghost.Ghost(action[0],action[1])
+        #     backup_state = new_state.copy()
+        #     new_state.update(ghost, agentIndex)
+        #     value = min(value, alphabeta(agents, nextAgent, depth, new_state ,alpha, beta))
+        #     beta = min(beta, value)
+        #     del new_state
+        #     new_state = backup_state.copy()
+        #     del backup_state
+            # if beta >= alpha:
+            #     del backup_state
+            #     break
+            # else:
+            #     del new_state
+            #     new_state = backup_state.copy()
+            #     del backup_state
+        path = Astar.lv4_astar(new_state.map, new_state.pacman.get_pos(), new_state.list_ghost[agentIndex-1].get_pos())
+        res = path[-2]
+        ghost = Ghost.Ghost(res[0],res[1])
+        new_state.update(ghost, agentIndex)
+        value = min(value, alphabeta(agents, nextAgent, depth, new_state ,alpha, beta))
+        beta = min(beta, value)
         return value
 
 def Level4_play(map_input):
