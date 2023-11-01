@@ -27,7 +27,7 @@ def read_map(filepath):
 
 map_dict = {'Level1':[read_map('Levels/level1/map1.txt'),read_map('Levels/level1/map2.txt')],
         'Level2':[read_map('Levels/level2/map1.txt'), read_map('Levels/level2/map2.txt')],
-        'Level3':[read_map('Levels/level3/map1.txt')],
+        'Level3':[read_map('Levels/level3/map2.txt')],
         'Level4':[]}
 
 change_map_list = [read_map('Levels/level1/map1.txt')[0],read_map('Levels/level1/map2.txt')[0]]

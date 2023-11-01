@@ -3,6 +3,8 @@ def Node(node, parent=None, g=0, h=0):
     return [node, parent, g, h]  # [(tuple chua x,y),parent,g,h]
 def heuristic(A,B):
     return math.sqrt((A[0]-B[0])**2+(A[1]-B[1])**2)
+def Euclid_distance(A,B):
+    return math.sqrt((A[0]-B[0])**2+(A[1]-B[1])**2)
 def astar(maze, start, goal):
     open_list = [Node(start)]
     closed_list = set()
@@ -47,7 +49,7 @@ def get_neighbors(maze, position):
             neighbors.append((x, y))
     return neighbors
 
-def nearest_astar(maze, start, goal):
+def nearst_astar(maze, start, goal,monsters_node):
     open_list = [Node(start)]
     closed_list = set()
     current_node = open_list[0]
@@ -65,7 +67,7 @@ def nearest_astar(maze, start, goal):
         cord, parent, g, h = current_node
         neighbors = get_neighbors(maze, cord)
         for neighbor in neighbors:
-                neighbor = Node(neighbor, current_node, g + 1, heuristic(neighbor, goal))
+                neighbor = Node(neighbor, current_node, g + 1, Euclid_distance(neighbor, goal))
                 if neighbor[0] in closed_list:
                     continue
                 check = False
