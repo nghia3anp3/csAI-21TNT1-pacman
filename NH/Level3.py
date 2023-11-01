@@ -47,16 +47,7 @@ def MonsterMove(maze,monsters_node,foods, monsters_path):
     for i, monster_node in enumerate(monsters_node):
         if monster_node[0] == monster_node[1]: # đi qua các vị trí xung quanh nó
             able_move = get_monster_neighbors(maze,monster_node[0])
-            if len(able_move)==2:
-                if able_move[0] not in foods:
-                    weights = [0.7,0.3]
-                    monster_node[0] = random.choices(able_move,weights)[0]
-                elif able_move[1] not in foods:
-                    weights = [0.3,0.7]
-                    monster_node[0] = random.choices(able_move,weights)[0]
-                else:
-                    monster_node[0] = random.choice(able_move)
-            elif len(able_move)==3:
+            if len(able_move)==3:
                 if able_move[0] not in foods:
                     weights = [0.8,0.1,0.1]
                     monster_node[1] = random.choices(able_move,weights)[0]
@@ -166,24 +157,22 @@ def heuristic(maze, pacman_pos, dict_score_maze,foods, pacman_path, monsters_nod
                           and check_safe_move(neighbor,monsters_node) is False):
                         score -= 100
                     else:
-                        score += 120
+                        score += 100
                 elif distance == 1:
                     score += 80
-                else:
-                    score += 40
             elif maze1[i[0]][i[1]] == 3: # monster
                 distance = Euclid_distance(neighbor,i)
                 if distance == 0:
                     score -= 500
                 elif distance == 1:
-                    score -= 150
+                    score -= 140
                 else:
                     score -= 60
         dict_score_maze[neighbor] = score
         # if dict_score_maze[neighbor]>0 and neighbor not in foods:
         #     dict_score_maze[neighbor] -= 30
         if neighbor in pacman_path:
-            dict_score_maze[neighbor] -= sum([1 for i in pacman_path if i == neighbor])*4
+            dict_score_maze[neighbor] -= sum([1 for i in pacman_path if i == neighbor])*3
         dict_score[neighbor] = dict_score_maze[neighbor]
     return dict_score, dict_score_maze
 
