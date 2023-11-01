@@ -1,3 +1,5 @@
+import math
+
 from Variables import *
 from Astar import *
 import copy
@@ -44,20 +46,9 @@ def get_monster_neighbors(maze, position):
 def MonsterMove(maze,monsters_node,foods, monsters_path):
     maze1 = copy.deepcopy(maze)
     monsters_subpath = []
-    for i, monster_node in enumerate(monsters_node):
+    for monster_node in monsters_node:
         if monster_node[0] == monster_node[1]: # đi qua các vị trí xung quanh nó
             able_move = get_monster_neighbors(maze,monster_node[0])
-            if len(able_move)==3:
-                if able_move[0] not in foods:
-                    weights = [0.8,0.1,0.1]
-                    monster_node[1] = random.choices(able_move,weights)[0]
-                elif able_move[1] not in foods:
-                    weights = [0.1,0.8,0.1]
-                    monster_node[0] = random.choices(able_move,weights)[0]
-                else:
-                    monster_node[0] = random.choice(able_move)
-            else:
-                monster_node[0] = random.choice(able_move)
             monster_node[0] = random.choice(able_move)
             maze1[monster_node[1][0]][monster_node[1][1]] = 0
             maze1[monster_node[0][0]][monster_node[0][1]] = 3
@@ -126,13 +117,21 @@ def count_foods_around_neigbor(maze,pacman_pos, neighbor,foods):
     region_neigbor = get_region_neighbor(maze, pacman_pos,neighbor)
     count = sum([1 for i in region_neigbor if i in foods])
     return count
+
+def case1(maze, monster,foods):
+    able_move = get_monster_neighbors(maze,monster)
+    if len(able_move) == 2:
+        count = sum([1 for i in able_move if i in foods])
+        if count == 2 and Euclid_distance(able_move[0],able_move[1]) == math.sqrt(2):
+            return True
+    return False
 def check_safe_move(pos,monsters_node):
     monsters = [i[0] for i in monsters_node]
     for monster in monsters:
         if Euclid_distance(pos,monster)<=1:
             return False
     return True
-def heuristic(maze, pacman_pos, dict_score_maze,foods, pacman_path, monsters_node, monsters_path):
+def heuristic(maze, pacman_pos, dict_score_maze,foods, pacman_path, monsters_node):
     maze1 = copy.deepcopy(maze)
     neighbors = get_neighbors(maze1, pacman_pos)
     dict_score = {}
@@ -153,47 +152,44 @@ def heuristic(maze, pacman_pos, dict_score_maze,foods, pacman_path, monsters_nod
                 if distance == 0:
                     if check_safe_move(i,monsters_node):
                         score += 500
-                    elif (count_foods_around_neigbor(maze,pacman_pos,i,foods)>=2
-                          and check_safe_move(neighbor,monsters_node) is False):
-                        score -= 100
+                    # elif (count_foods_around_neigbor(maze,pacman_pos,i,foods)>=2
+                    #       and check_safe_move(neighbor,monsters_node) is False):
+                    #     score -= 100
                     else:
                         score += 100
                 elif distance == 1:
                     score += 80
+                else:
+                    score += 30
             elif maze1[i[0]][i[1]] == 3: # monster
                 distance = Euclid_distance(neighbor,i)
                 if distance == 0:
-                    score -= 500
+                    score -= 200
                 elif distance == 1:
                     score -= 140
                 else:
                     score -= 60
         dict_score_maze[neighbor] = score
-        # if dict_score_maze[neighbor]>0 and neighbor not in foods:
-        #     dict_score_maze[neighbor] -= 30
+        count_neighbor = sum([1 for i in pacman_path if i == neighbor])
+        count_pacmanpos = sum([1 for i in pacman_path if i == pacman_pos])
+        if neighbor in foods and count_neighbor == 0 and count_pacmanpos>=10:
+            dict_score_maze[neighbor] += 50
         if neighbor in pacman_path:
-            dict_score_maze[neighbor] -= sum([1 for i in pacman_path if i == neighbor])*3
+            dict_score_maze[neighbor] -= count_neighbor*3
         dict_score[neighbor] = dict_score_maze[neighbor]
     return dict_score, dict_score_maze
 
-def IdentifyStep(maze, pacman_pos, monsters_node, dict_score_maze,foods,pacman_path,monsters_path):
-    dict_score, dict_score_maze = heuristic(maze, pacman_pos, dict_score_maze,foods, pacman_path, monsters_node, monsters_path)
+def IdentifyStep(maze, pacman_pos, monsters_node, dict_score_maze,foods,pacman_path):
+    dict_score, dict_score_maze = heuristic(maze, pacman_pos, dict_score_maze,foods, pacman_path, monsters_node)
     count1 = sum([1 for value in dict_score.values() if value >= 0]) # đếm số lượng neighbor có score lớn hơn 0
-    max_value = max(dict_score.values())
-    list_keys = [key for key,value in dict_score.items() if value == max_value]
     if count1>0: # có thức ăn trong tầm nhìn
-        return random.choice(list_keys)
+        return max(dict_score.items(),key=lambda x:x[1])[0]
     else: # không có thức ăn trong tầm nhìn
-        # goal = get_foods_no_eaten(maze,pacman_pos,foods,dict_score_maze)
-        # if goal is not None:
-        #     dict_score_maze[goal] += 100
-        #     visible = get_pacman_visible(maze, goal)
-        #     for i in visible:
-        #         if i not in dict_score_maze:
-        #             dict_score[i] = 50
-        #         else:
-        #             dict_score_maze[i] += 50
-        return random.choice(list_keys)
+        # a = sorted(dict_score_maze.keys(),reverse=True)
+        # for i in a:
+        #     if i in foods:
+        #         return min(dict_score.keys(),key=lambda x:Euclid_distance(x,i))
+        return max(dict_score.items(),key=lambda x:x[1])[0]
 def pre_Level3(maze_in):
     maze_input = copy.deepcopy(maze_in)
     maze = maze_input[0]
@@ -208,19 +204,16 @@ def pre_Level3(maze_in):
     while(True):
         if not foods:
             break
-        # if len(pacman_path)>1000:
-        #     break
-        dict_score, dict_score_maze = heuristic(maze1, pacman_pos, dict_score_maze,foods, pacman_path, monsters_node,monsters_path)
-        pacman_pos = IdentifyStep(maze1,pacman_pos,monsters_node,dict_score_maze,foods, pacman_path,monsters_path)
+        dict_score, dict_score_maze = heuristic(maze1, pacman_pos, dict_score_maze,foods, pacman_path, monsters_node)
+        pacman_pos = IdentifyStep(maze1,pacman_pos,monsters_node,dict_score_maze,foods, pacman_path)
+        pacman_path.append(pacman_pos)
         maze1, monsters_node, monsters_path = MonsterMove(maze1, monsters_node, foods,monsters_path)
         if pacman_pos in [i[0] for i in monsters_node]:
             return maze1,pacman_path, monsters_path,'dead'
-        pacman_path.append(pacman_pos)
         if pacman_pos in foods:
             maze1, foods = eatFood(maze1, pacman_pos,foods)
             if not foods:
                 return maze1,pacman_path, monsters_path,'alive'
-    return maze1, pacman_path, monsters_path, 'dead'
 def Level3(maze_input):
     maze, pacman_path, monsters_path, status = pre_Level3(maze_input)
     foods = maze_input[2]
@@ -248,7 +241,7 @@ def Level3(maze_input):
             screen.blit(mouse, (get_map_pos_y(maze, CELL_SIZE) + monster_path[1] * CELL_SIZE,
                                 get_map_pos_x(maze, CELL_SIZE) + monster_path[0] * CELL_SIZE))
         pygame.display.update()
-        time.sleep(0.01)
+        time.sleep(0.02)
         path_i += 1
         if (path_i == len(pacman_path)):
             running = False
