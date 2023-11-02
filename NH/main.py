@@ -1,20 +1,29 @@
-import State
+# from Variables import *
+# import Level12
+# import pygame
+# import time
+# import sys
+#
+#
+# # Main loop
+# if __name__ == "__main__":
+#     Level12.Level12()
 import Level12
-import Level4_play
+import Level3
+import Level4
 from Variables import *
 import pygame, sys
 from Button import Button
 import Map
-
 pygame.init()
+
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("One Piece Pacman")
 
 BG = pygame.transform.scale(pygame.image.load("images/Background.png"),(WIDTH,HEIGHT))
 LOGO = pygame.transform.scale(pygame.image.load("images/logo.png"),(500,300))
 map_pos = 0
-def get_font(size):  
-  return pygame.font.Font("font/font.ttf", size)
+
 
 
 def play():
@@ -48,32 +57,31 @@ def play():
         sys.exit()
       if event.type == pygame.MOUSEBUTTONDOWN:
         if PLAY_LEVEL1.checkForInput(PLAY_MOUSE_POS):
-          Level1()
+          Level1_go()
         if PLAY_LEVEL2.checkForInput(PLAY_MOUSE_POS):
-          Level2()
+          Level2_go()
         if PLAY_LEVEL3.checkForInput(PLAY_MOUSE_POS):
-          Level3()
+          Level3_go()
         if PLAY_LEVEL4.checkForInput(PLAY_MOUSE_POS):
-          Level4()
+          Level4_go()
         if PLAY_BACK.checkForInput(PLAY_MOUSE_POS):
           main_menu()
 
     pygame.display.update()
 
-def Level1():
+def Level1_go():
   global map_pos
-  current_map = map_dict['Level1'][map_pos]
-  Level12.Level12(current_map)
-def Level2():
+  Level12.Level12(map_dict['Level1'][map_pos])
+
+def Level2_go():
   global map_pos
-  current_map=map_dict['Level2'][map_pos]
-  Level12.Level12(current_map)
-def Level3():
-  return
-def Level4():
+  Level12.Level12(map_dict['Level2'][map_pos])
+def Level3_go():
   global map_pos
-  current_map = map_dict['Level4'][map_pos]
-  Level4_play.Level4_play(current_map)
+  Level3.Level3(map_dict['Level3'][map_pos])
+def Level4_go():
+  global map_pos
+  Level4.Level4(map_dict['Level4'][map_pos])
 def options():
   global map_pos
   while True:
@@ -142,7 +150,7 @@ def main_menu():
     for event in pygame.event.get():
       if event.type == pygame.QUIT:
         pygame.quit()
-        sys.exit()  
+        sys.exit()
       if event.type == pygame.MOUSEBUTTONDOWN:
         if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
           play()
@@ -154,4 +162,5 @@ def main_menu():
 
     pygame.display.update()
 
-main_menu()
+if __name__ == '__main__':
+  main_menu()

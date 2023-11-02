@@ -2,8 +2,22 @@ from Variables import *
 
 luffy_left = pygame.image.load("images/luffy_left.png")
 luffy_right = pygame.image.load("images/luffy_right.png")
-luffy_full = pygame.image.load("images/luffy_full.png")
 luffy_left = pygame.transform.scale(luffy_left, (CELL_SIZE, CELL_SIZE))
 luffy_right = pygame.transform.scale(luffy_right, (CELL_SIZE, CELL_SIZE))
-luffy_full = pygame.transform.scale(luffy_full, (CELL_SIZE, CELL_SIZE))
-endings = [pygame.image.load("images/endings/1.png"),pygame.image.load("images/endings/2.png"),pygame.image.load("images/endings/3.png"),pygame.image.load("images/endings/4.png"),pygame.image.load("images/endings/5.png"),pygame.image.load("images/endings/6.png"),pygame.image.load("images/endings/7.png"),pygame.image.load("images/endings/8.png"),pygame.image.load("images/endings/9.png"),pygame.image.load("images/endings/10.png"),pygame.image.load("images/endings/11.png"),pygame.image.load("images/endings/12.png"),pygame.image.load("images/endings/13.png"),pygame.image.load("images/endings/14.png"),pygame.image.load("images/endings/15.png"),pygame.image.load("images/endings/16.png"),pygame.image.load("images/endings/17.png"),pygame.image.load("images/endings/18.png"),pygame.image.load("images/endings/19.png"),pygame.image.load("images/endings/20.png")]
+
+class Pacman:
+    def __init__(self, pos_x, pos_y, agent=0) -> None:
+        self.x = pos_x
+        self.y = pos_y
+        self.agent = agent
+
+    def get_pos(self):
+        return (self.x, self.y)
+
+    def set_pos(self, new_x, new_y):
+        self.x = new_x
+        self.y = new_y
+
+    def copy(self):
+        new_pacman = Pacman(self.x, self.y, self.agent)
+        return new_pacman
