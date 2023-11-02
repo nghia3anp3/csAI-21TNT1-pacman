@@ -23,15 +23,16 @@ def read_map(filepath):
         pac_pos = tuple(map(int, file.readline().strip().split(" ")))
         food = [(i, j) for i in range(len(pac_map)) for j in range(len(pac_map[0])) if pac_map[i][j] == 2]
         monster = [(i, j) for i in range(len(pac_map)) for j in range(len(pac_map[0])) if pac_map[i][j] == 3]
-        return [pac_map, pac_pos, food, monster]
+        wall = [(i, j) for i in range(len(pac_map)) for j in range(len(pac_map[0])) if pac_map[i][j] == 1]
+        return [pac_map, pac_pos, food, monster, wall]
 
-map_dict = {'Level1':[read_map('Levels/level1/map1.txt'),read_map('Levels/level1/map2.txt')],
-        'Level2':[read_map('Levels/level2/map1.txt'), read_map('Levels/level2/map2.txt')],
-        'Level3':[read_map('Levels/level3/map1.txt'), read_map('Levels/level3/map2.txt')],
-        'Level4':[]}
+map_dict = {'Level1':[read_map('Levels/level1/map1.txt'),read_map('Levels/level1/map2.txt'),read_map('Levels/level1/map3.txt')],
+        'Level2':[read_map('Levels/level2/map1.txt'), read_map('Levels/level2/map2.txt'),read_map('Levels/level1/map3.txt')],
+        'Level3':[read_map('Levels/level3/map1.txt'), read_map('Levels/level3/map2.txt'),read_map('Levels/level3/map3.txt')],
+        'Level4':[read_map('Levels/level4/map1.txt'),read_map('Levels/level4/map2.txt'),read_map('Levels/level4/map3.txt')]}
 
 
-change_map_list = [read_map('Levels/level1/map1.txt')[0],read_map('Levels/level1/map2.txt')[0]]
+change_map_list = [read_map('Levels/level1/map1.txt')[0],read_map('Levels/level1/map2.txt')[0],read_map('Levels/level1/map3.txt')[0]]
 victory_bg = pygame.transform.scale(pygame.image.load("images/victory.png"),(WIDTH,HEIGHT))
 def get_map_pos_y(map,CELL_SIZE):
     return WIDTH // 2 - (CELL_SIZE * len(map[0]) // 2)

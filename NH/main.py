@@ -10,6 +10,7 @@
 #     Level12.Level12()
 import Level12
 import Level3
+import Level4
 from Variables import *
 import pygame, sys
 from Button import Button
@@ -79,7 +80,8 @@ def Level3_go():
   global map_pos
   Level3.Level3(map_dict['Level3'][map_pos])
 def Level4_go():
-  return
+  global map_pos
+  Level4.Level4(map_dict['Level4'][map_pos])
 def options():
   global map_pos
   while True:

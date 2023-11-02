@@ -69,12 +69,14 @@ def Level12(map_input):
                 for mons in monster:
                     screen.blit(marine, (get_map_pos_y(map, CELL_SIZE) + mons[1] * CELL_SIZE,get_map_pos_x(map, CELL_SIZE) + mons[0] * CELL_SIZE))
                 path_i += 1
-                text = font.render(f"Score: {score}", True, BLACK)
+                text = get_font(30).render(f"Score: {score}", True, BLACK)
                 screen.blit(text, (10, 10))
                 time.sleep(0.2)
                 pygame.display.update()
         else:
             victory_state(screen)
+            text = get_font(30).render(f"Score: {score}", True, BLACK)
+            screen.blit(text, (80, 500))
             pygame.display.update()
     pygame.quit()
     sys.exit()
