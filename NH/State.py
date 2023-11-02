@@ -166,7 +166,7 @@ class State():
         
         elif min_ghost_distance<=3:
             if (depth!=None):
-                return -99999  + depth*max_distance + self.score
+                return -99999  + depth + max_distance + self.score
             else:
                 return -99999 + self.score
         return self.score + min_ghost_distance - total_ghost_distance - min_distance
