@@ -12,6 +12,33 @@ mouse = Mouse.mouse_left
 meat = Food.meat
 endings = Luffy.endings
 
+def getObservation(agents_pos, wall, mouse_pos=None):
+    legalPath = []
+    for x in range(-1, 2):
+        for y in range(-1, 2):
+            if (x!=0 and y!=0) or (abs(x)+abs(y)!=2):
+                new_pos = (agents_pos[0] + x, agents_pos[1] + y)
+                if (mouse_pos!=None):
+                    if new_pos not in wall and new_pos not in mouse_pos:
+                        legalPath.append(new_pos)
+                else:
+                    if new_pos not in wall:
+                        legalPath.append(new_pos)
+    return legalPath
+
+def getObservation_2(agents_pos, wall, mouse_pos=None):
+    legalPath = []
+    for x in range(-1, 2):
+        for y in range(-1, 2):
+            new_pos = (agents_pos[0] + x, agents_pos[1] + y)
+            if (mouse_pos!=None):
+                if new_pos not in wall and new_pos not in mouse_pos:
+                    legalPath.append(new_pos)
+            else:
+                if new_pos not in wall:
+                    legalPath.append(new_pos)
+    return legalPath
+
 class State():
 
     def __init__(self, pacman, list_ghost, list_food, wall, map, score =0)->None:
@@ -37,14 +64,12 @@ class State():
         pygame.display.update()
         
     def copy(self):
-            # Tạo bản sao của đối tượng State
-        new_pacman = self.pacman  # Tạo bản sao của Pacman (tùy theo cách bạn đã triển khai lớp Pacman)
-        new_list_ghost = [ghost.copy() for ghost in self.list_ghost]  # Tạo bản sao của danh sách Ghost
-        new_list_food = self.list_food.copy()  # Tạo bản sao của danh sách đồ ăn
-        new_wall = self.wall.copy()  # Tạo bản sao của danh sách tường
-        new_score = self.score  # Sao chép điểm số
+        new_pacman = self.pacman  
+        new_list_ghost = [ghost.copy() for ghost in self.list_ghost]  
+        new_list_food = self.list_food.copy()
+        new_wall = self.wall.copy() 
+        new_score = self.score 
         new_map = self.map
-        # Tạo một đối tượng State mới với các bản sao đã tạo
         new_state = State(new_pacman, new_list_ghost, new_list_food, new_wall, new_map, new_score)
         return new_state
     
@@ -54,7 +79,7 @@ class State():
         if (Astar.lv4_astar(self.map,pac_pos,ghost_pos)==None):
             return 0
         return len(Astar.astar(self.map,pac_pos,ghost_pos))
-    def update(self, new_value, index):
+    def update(self, new_value, index, depth = None):
         if index == 0:
             new_food = self.list_food
             if new_value.get_pos() in self.list_food:
@@ -70,7 +95,6 @@ class State():
     def is_win(self):
         if not self.list_food:
             return True
-        # self.score = 999
         return False
     
     def is_lose(self):
@@ -78,7 +102,6 @@ class State():
         for ghost in self.list_ghost:
             ghost_pos = ghost.get_pos()
             if pacman_pos == ghost_pos:
-                # self.score = -99
                 return True
         return False
     
@@ -91,17 +114,21 @@ class State():
     def manhattanDistance(self, xy1, xy2):
         return abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
     
-    def get_min_distance_to_ghost(self):
-        min_distance = 999
+    def get_total_distance_to_ghost(self):
         total = 0
         for index in range(len(self.list_ghost)):
             distance = self.get_astar(index)
-            # if distance < min_distance:
-            #     min_distance = distance
             total += distance
-
-        # return min_distance
         return total
+    
+    def get_min_distance_to_ghost(self):
+        min_distance = 999
+        for index in range(len(self.list_ghost)):
+            distance = self.get_astar(index)
+            if distance < min_distance:
+                min_distance = distance
+
+        return min_distance
     
     def get_min_distance_to_food(self):
         min_distance = float('inf')
@@ -114,41 +141,35 @@ class State():
             if distance < min_distance:
                     min_distance = distance
 
-        return min_distance
-    
+        return min_distance    
 
-    def eval_state(self, agentIndex):
+    def eval_state(self, depth=None):
         pacman_pos = self.pacman.get_pos()
         min_distance = 999
+        max_distance = -999
         for food_pos in self.list_food:
             distance = self.manhattanDistance(pacman_pos, food_pos)
             if distance < min_distance:
                 min_distance = distance
+            elif distance > max_distance:
+                max_distance = distance
 
+        total_ghost_distance = self.get_total_distance_to_ghost()
         min_ghost_distance = self.get_min_distance_to_ghost()
-        
-        # if agentIndex == 0:
-        #     if (self.is_win()):
-        #         return 999
-        #     elif (self.is_lose()):
-        #         return -999
-        #     elif min_ghost_distance<=2:
-        #         return -999   
-        #     else:
-        #         return self.score
 
-        # else:
         if (self.is_win()):
+            print("win")
             return 999999999
-        # elif min_ghost_distance<=4:
-        #     return -99999 + self.score + min_ghost_distance
+
         elif (self.is_lose()):
             return -999999999 
-        #     else:
-        #         return min_ghost_distance
-        # if min_ghost_distance<=3:
-        #         return -999 + min_ghost_distance
-        return self.score + min_ghost_distance - 2*min_distance
+        
+        elif min_ghost_distance<=3:
+            if (depth!=None):
+                return -99999  + depth*max_distance + self.score
+            else:
+                return -99999 + self.score
+        return self.score + min_ghost_distance - total_ghost_distance - min_distance
     
     def getNumAgents(self):
         return len(self.list_ghost)+1
@@ -159,3 +180,18 @@ class State():
         for x in self.list_ghost:
             ret.append(x)
         return ret
+    
+    def check_obs(self):
+        mouse_pos = []  
+        obs_ghost = []
+        for x in self.list_ghost:
+            mouse_pos.append(x.get_pos())
+            for i in getObservation_2(x.get_pos(), self.wall):
+                obs_ghost.append(i)
+        obs_pac = getObservation_2(self.pacman.get_pos(), self.wall, mouse_pos)
+        for x in obs_pac:
+            if x not in obs_ghost:
+                print("khong co")
+                return False
+        return True
+        

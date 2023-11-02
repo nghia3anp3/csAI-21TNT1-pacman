@@ -15,8 +15,7 @@ pygame.init()
 pygame.font.init()
 
 global max_depth
-max_depth = 10
-
+max_depth = 25
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("PacMan")
 font = pygame.font.Font(None, 20)
@@ -48,9 +47,9 @@ def alphabeta(agentList, agentIndex, depth, gameState, alpha, beta):
     new_state = gameState.copy()
     agents = new_state.getAgents()
     if new_state.is_win() or new_state.is_lose() or depth==max_depth:
-        return new_state.eval_state(agentIndex)+depth
+        return new_state.eval_state(depth)
         
-    if agentIndex == 0: #maximize for pacman
+    if agentIndex == 0:
         depth += 1
         global value
         value = -999999
@@ -58,47 +57,24 @@ def alphabeta(agentList, agentIndex, depth, gameState, alpha, beta):
         for x in agents[1:]:
             ghost_pos.append(x.get_pos())
         for action in getObservation(agents[agentIndex].get_pos(), new_state.wall, ghost_pos):
-            # print("index 0 action alphabeta: ", action)
             pacman = Pacman.Pacman(action[0],action[1])
             backup_state = new_state.copy()
-            new_state.update(pacman, agentIndex)
+            new_state.update(pacman, agentIndex, depth)
             value = max(value, alphabeta(agents, 1, depth, new_state ,alpha, beta))
             alpha = max(alpha, value)
             
             del new_state
             new_state = backup_state.copy()
             del backup_state
-            # if beta <= alpha:
-            #     del backup_state
-            #     break
-            # else:
-            #     del new_state
-            #     new_state = backup_state.copy()
-            #     del backup_state
+
         return value
     else:
         nextAgent = agentIndex + 1
         depth += 1
         if new_state.getNumAgents() == nextAgent:
             nextAgent = 0
-        # for action in getObservation(agents[agentIndex].get_pos(), new_state.wall):
-        #     # print("index 1 action alphabeta: ", action)
         value = 999999
-        #     ghost = Ghost.Ghost(action[0],action[1])
-        #     backup_state = new_state.copy()
-        #     new_state.update(ghost, agentIndex)
-        #     value = min(value, alphabeta(agents, nextAgent, depth, new_state ,alpha, beta))
-        #     beta = min(beta, value)
-        #     del new_state
-        #     new_state = backup_state.copy()
-        #     del backup_state
-            # if beta >= alpha:
-            #     del backup_state
-            #     break
-            # else:
-            #     del new_state
-            #     new_state = backup_state.copy()
-            #     del backup_state
+
         path = Astar.lv4_astar(new_state.map, new_state.pacman.get_pos(), new_state.list_ghost[agentIndex-1].get_pos())
         res = path[-2]
         ghost = Ghost.Ghost(res[0],res[1])
@@ -108,7 +84,6 @@ def alphabeta(agentList, agentIndex, depth, gameState, alpha, beta):
         return value
 
 def Level4_play(map_input):
-    #==========================================INIT MAP=================================================================
     global score
     map = map_input[0]
     pac_pos = map_input[1]
@@ -120,8 +95,6 @@ def Level4_play(map_input):
     meat = Food.meat
     mouse_list = monster
     endings = Luffy.endings
-    ending_check = False
-    #=========================================INIT STATE===================================================
     list_ghost = []
     for x in monster:
         list_ghost.append(Ghost.Ghost(x[0],x[1]))
@@ -145,7 +118,6 @@ def Level4_play(map_input):
     wining = False
     luffy_path = []
     mouse_path = [] 
-    new_ghost_positions = [] 
     while running:
         print("Diem: ",init_state.get_score())
         for event in pygame.event.get():
@@ -158,7 +130,6 @@ def Level4_play(map_input):
             agent = agents[agentIndex]
             
             mouse_pos = []
-            # print("Posible action {}:".format(i), PosibleActions)
             alpha = -999999
             beta = 999999  
 
@@ -182,33 +153,11 @@ def Level4_play(map_input):
                 max_action = max(action_scores)
                 max_indices = [index for index in range(len(action_scores)) if action_scores[index] == max_action]
                 chosenIndex = random.choice(max_indices)
-                # chosenIndex = max_indices[0]
-                # position = [PosibleActions[index] for index in range(len(action_scores))]
-                # print("Cac huong di: ", position)
-                # print("Diem chon: ", max_action)
                 res = PosibleActions[chosenIndex]
             else:
-                # PosibleActions = getObservation(agent.get_pos(), wall)
-                # for action in PosibleActions:
-                #     state_recusive.update(Ghost.Ghost(action[0],action[1]), agentIndex)
-                #     action_scores.append(alphabeta(agents, 0, 0, state_recusive, alpha, beta))
-                #     state_recusive = backup_state.copy()
-                # max_action = min(action_scores)
                 path = Astar.lv4_astar(state_recusive.map, state_recusive.pacman.get_pos(), state_recusive.list_ghost[agentIndex-1].get_pos())
                 res = path[-2]
-
-            # max_indices = [index for index in range(len(action_scores)) if action_scores[index] == max_action]
-            # chosenIndex = random.choice(max_indices)
-            # # chosenIndex = max_indices[0]
-            # position = [PosibleActions[index] for index in range(len(action_scores))]
-            # print("Cac huong di: ", position)
-            # print("Diem chon: ", max_action)
-            # res = PosibleActions[chosenIndex]
-
-            print("Score la {}, res la {}, cua index {} || ".format(action_scores, res, agentIndex))
-            # cap nhat lai map
             if agentIndex == 0:
-                # print("Pacman turn: ")
                 luffy_path.append(res)
                 new_pacman_pos = (res[0], res[1])
                 new_pacman = Pacman.Pacman(new_pacman_pos[0], new_pacman_pos[1])
@@ -223,13 +172,7 @@ def Level4_play(map_input):
                 mouse_path = []
                 luffy_path=[]
 
-                # =======================================================
                 mouse_pos = [x.get_pos() for x in init_state.list_ghost]
-                # if (init_state.pacman.get_pos() in mouse_pos):
-                #     wining = True
-                #     print("You lose!")
-                #     break
-                # =======================================================
                 print(len(init_state.list_food))
 
                 if (len(init_state.list_food)==0):
@@ -240,8 +183,7 @@ def Level4_play(map_input):
                         pygame.display.update()
 
             agentIndex = (agentIndex + 1) % numAgents
-            time.sleep(0.1)
+            time.sleep(0.03)
         else:
             print("You win!")
             break
-    #==============================================================================================================================

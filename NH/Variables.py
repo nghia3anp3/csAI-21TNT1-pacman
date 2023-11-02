@@ -2,9 +2,6 @@ import pygame
 import math
 from pygame.locals import *
 
-global current_map
-current_map = []
-
 WIDTH = 1280
 HEIGHT = 720
 CELL_SIZE = 30
@@ -34,7 +31,7 @@ map_dict = {'Level1':[read_map('Levels/level1/map1.txt'),read_map('Levels/level1
         'Level2':[read_map('Levels/level2/map1.txt'), read_map('Levels/level1/map1.txt')],
         'Level2':[read_map('Levels/level2/map1.txt'), read_map('Levels/level2/map2.txt')],
         'Level3':[],
-        'Level4':[read_map('Levels/level4/mapKhoi.txt'),read_map('Levels/level4/mapeasy.txt')]}
+        'Level4':[read_map('Levels/level4/mapeasy.txt'),read_map('Levels/level4/mapeasy.txt')]}
 
 change_map_list = [read_map('Levels/level4/mapeasy.txt')[0],read_map('Levels/level4/mapeasy.txt')[0]]
 
