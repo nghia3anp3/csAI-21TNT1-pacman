@@ -13,7 +13,7 @@ pygame.init()
 pygame.font.init()
 
 global max_depth
-max_depth = 25
+max_depth = 4
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("One piece Pac Man")
 font = get_font(20)
@@ -120,7 +120,6 @@ def Level4(map_input):
     # ===========================================RUN GAME====================================================================
     agentIndex = 0
     numAgents = init_state.getNumAgents()
-    wining = False
     luffy_path = []
     marine_path = []
     while running:
@@ -153,10 +152,11 @@ def Level4(map_input):
                     state_recusive.update(Luffy.Pacman(action[0], action[1]), 0)
                     action_scores.append(alphabeta(agents, 1, 0, state_recusive, alpha, beta))
                     state_recusive = backup_state.copy()
-                if len(action_scores) == 0:
+                
+                if len(action_scores)==0:
+                    lost_check =True
                     continue
-                else:
-                    max_action = max(action_scores)
+                max_action = max(action_scores)
                 max_indices = [index for index in range(len(action_scores)) if action_scores[index] == max_action]
                 chosenIndex = random.choice(max_indices)
                 res = PosibleActions[chosenIndex]
@@ -164,6 +164,7 @@ def Level4(map_input):
                 path = Astar.lv4_astar(state_recusive.map, state_recusive.pacman.get_pos(),
                                        state_recusive.list_ghost[agentIndex - 1].get_pos())
                 res = path[-2]
+
             if agentIndex == 0:
                 luffy_path.append(res)
                 new_pacman_pos = (res[0], res[1])
@@ -180,7 +181,6 @@ def Level4(map_input):
                 luffy_path = []
 
                 marine_pos = [x.get_pos() for x in init_state.list_ghost]
-                # print(len(init_state.list_food))
 
                 if (len(init_state.list_food) == 0):
                     victory_check = True
