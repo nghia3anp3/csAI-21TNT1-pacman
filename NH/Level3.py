@@ -104,25 +104,11 @@ def get_region_neighbor(maze, pacman_pos,neighbor):
                     list_d.append((dx,delta_y*dy))
         list_d.append((0,delta_y*2))
     for dx, dy in list_d:
-        new_x = pacman_pos[0] + dx
-        new_y = pacman_pos[1] + dy
+        new_x = neighbor[0] + dx
+        new_y = neighbor[1] + dy
         if 0<= new_y<len(maze[0]) and 0<=new_x<len(maze):
             list_pos.append((new_x,new_y))
     return list_pos
-
-
-def count_foods_around_neigbor(maze,pacman_pos, neighbor,foods):
-    region_neigbor = get_region_neighbor(maze, pacman_pos,neighbor)
-    count = sum([1 for i in region_neigbor if i in foods])
-    return count
-
-def case1(maze, monster,foods):
-    able_move = get_monster_neighbors(maze,monster)
-    if len(able_move) == 2:
-        count = sum([1 for i in able_move if i in foods])
-        if count == 2 and Euclid_distance(able_move[0],able_move[1]) == math.sqrt(2):
-            return True
-    return False
 def check_safe_move(pos,monsters_node):
     monsters = [i[0] for i in monsters_node]
     for monster in monsters:
@@ -139,22 +125,11 @@ def heuristic(maze, pacman_pos, dict_score_maze,foods, pacman_path, monsters_nod
         for i in region_neighbor:
             if maze1[i[0]][i[1]] == 0: # đường đi
                 score -= 1
-            # elif maze1[i[0]][i[1]] == 1: # wall
-            #     distance = Euclid_distance(neighbor,i)
-            #     if distance == 1:
-            #         score -= 2
-            #     else:
-            #         score -= 1
             elif maze1[i[0]][i[1]] == 2: # food
                 distance = Euclid_distance(neighbor,i)
                 if distance == 0:
                     if check_safe_move(i,monsters_node):
                         score += 500
-                    # elif (count_foods_around_neigbor(maze,pacman_pos,i,foods)>=2
-                    #       and check_safe_move(neighbor,monsters_node) is False):
-                    #     score -= 100
-                    else:
-                        score += 100
                 elif distance == 1:
                     score += 80
                 else:
@@ -173,21 +148,13 @@ def heuristic(maze, pacman_pos, dict_score_maze,foods, pacman_path, monsters_nod
         if neighbor in foods and count_neighbor == 0 and count_pacmanpos>=10:
             dict_score_maze[neighbor] += 50
         if neighbor in pacman_path:
-            dict_score_maze[neighbor] -= count_neighbor*3
+            dict_score_maze[neighbor] -= count_neighbor*6
         dict_score[neighbor] = dict_score_maze[neighbor]
     return dict_score, dict_score_maze
 
 def IdentifyStep(maze, pacman_pos, monsters_node, dict_score_maze,foods,pacman_path):
     dict_score, dict_score_maze = heuristic(maze, pacman_pos, dict_score_maze,foods, pacman_path, monsters_node)
-    count1 = sum([1 for value in dict_score.values() if value >= 0]) # đếm số lượng neighbor có score lớn hơn 0
-    if count1>0: # có thức ăn trong tầm nhìn
-        return max(dict_score.items(),key=lambda x:x[1])[0]
-    else: # không có thức ăn trong tầm nhìn
-        # a = sorted(dict_score_maze.keys(),reverse=True)
-        # for i in a:
-        #     if i in foods:
-        #         return min(dict_score.keys(),key=lambda x:Euclid_distance(x,i))
-        return max(dict_score.items(),key=lambda x:x[1])[0]
+    return max(dict_score.items(),key=lambda x:x[1])[0]
 def pre_Level3(maze_in):
     maze_input = copy.deepcopy(maze_in)
     maze = maze_input[0]
