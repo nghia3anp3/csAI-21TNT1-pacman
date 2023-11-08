@@ -31,7 +31,7 @@ map_dict = {'Level1':[read_map('Levels/level1/map1.txt'),read_map('Levels/level1
         'Level3':[read_map('Levels/level3/map1.txt'), read_map('Levels/level3/map2.txt'),read_map('Levels/level3/map3.txt'),read_map('Levels/level3/map4.txt'),read_map('Levels/level3/map5.txt')],
         'Level4':[read_map('Levels/level4/map1.txt'),read_map('Levels/level4/map2.txt'),read_map('Levels/level4/map3.txt'),read_map('Levels/level4/map4.txt'),read_map('Levels/level4/map5.txt')]}
 
-
+max_depth = 0
 change_map_list = [read_map('Levels/level1/map1.txt')[0],read_map('Levels/level1/map2.txt')[0],read_map('Levels/level1/map3.txt')[0],read_map('Levels/level1/map4.txt')[0],read_map('Levels/level1/map5.txt')[0]]
 victory_bg = pygame.transform.scale(pygame.image.load("images/victory.png"),(WIDTH,HEIGHT))
 lost_bg = pygame.transform.scale(pygame.image.load("images/lost.png"),(WIDTH,HEIGHT))

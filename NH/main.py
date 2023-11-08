@@ -63,7 +63,7 @@ def play():
         if PLAY_LEVEL3.checkForInput(PLAY_MOUSE_POS):
           Level3_go()
         if PLAY_LEVEL4.checkForInput(PLAY_MOUSE_POS):
-          Level4_go()
+          Level4_max_depth()
         if PLAY_BACK.checkForInput(PLAY_MOUSE_POS):
           main_menu()
 
@@ -72,16 +72,60 @@ def play():
 def Level1_go():
   global map_pos
   Level12.Level12(map_dict['Level1'][map_pos])
-
 def Level2_go():
   global map_pos
   Level12.Level12(map_dict['Level2'][map_pos])
 def Level3_go():
   global map_pos
   Level3.Level3(map_dict['Level3'][map_pos])
-def Level4_go():
+def Level4_go(max_depth):
   global map_pos
-  Level4.Level4(map_dict['Level4'][map_pos])
+  Level4.Level4(map_dict['Level4'][map_pos], max_depth)
+def Level4_max_depth():
+  global max_depth
+  while True:
+    OPTIONS_MOUSE_POS = pygame.mouse.get_pos()
+    screen.fill("BLACK")
+    MAX_DEPTH_DISPLAY = get_font(50).render(str(max_depth), True, "White")
+    MAX_DEPTH_DISPLAY_RECT = MAX_DEPTH_DISPLAY.get_rect(center=(640, 360))
+    screen.blit(MAX_DEPTH_DISPLAY, MAX_DEPTH_DISPLAY_RECT)
+
+    PLAY_TEXT = get_font(45).render("Choose max depth:", True, "White")
+    PLAY_RECT = PLAY_TEXT.get_rect(center=(640, 50))
+    screen.blit(PLAY_TEXT, PLAY_RECT)
+
+    OPTIONS_PREVIOUS = Button(image=None, pos=(300, 360),
+                         text_input="<", font=get_font(40), base_color="White", hovering_color="Green")
+    OPTIONS_NEXT = Button(image=None, pos=(980, 360),
+                         text_input=">", font=get_font(40), base_color="White", hovering_color="Green")
+    OPTIONS_BACK = Button(image=None, pos=(640, 600),
+                       text_input="CONFIRM", font=get_font(20), base_color="White", hovering_color="Green")
+    OPTIONS_BACK.changeColor(OPTIONS_MOUSE_POS)
+    OPTIONS_BACK.update(screen)
+    for button in [OPTIONS_PREVIOUS, OPTIONS_NEXT,OPTIONS_BACK]:
+      button.changeColor(OPTIONS_MOUSE_POS)
+      button.update(screen)
+
+    for event in pygame.event.get():
+      if event.type == pygame.QUIT:
+        pygame.quit()
+        sys.exit()
+      if event.type == pygame.MOUSEBUTTONDOWN:
+        if OPTIONS_PREVIOUS.checkForInput(OPTIONS_MOUSE_POS):
+          if max_depth == 0:
+            max_depth = 0
+            print(max_depth)
+          else:
+            max_depth -=1
+        if OPTIONS_NEXT.checkForInput(OPTIONS_MOUSE_POS):
+          if max_depth == 25:
+            max_depth = 25
+          else:
+            max_depth += 1
+            print(max_depth)
+        if OPTIONS_BACK.checkForInput(OPTIONS_MOUSE_POS):
+          Level4_go(max_depth)
+    pygame.display.update()
 def options():
   global map_pos
   while True:

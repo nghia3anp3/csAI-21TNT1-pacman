@@ -12,8 +12,6 @@ import random
 pygame.init()
 pygame.font.init()
 
-global max_depth
-max_depth = 4
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("One piece Pac Man")
 font = get_font(20)
@@ -44,7 +42,7 @@ def getObservation(agents_pos, wall, marine_pos=None):
     return legalPath
 
 
-def alphabeta(agentList, agentIndex, depth, gameState, alpha, beta):
+def alphabeta(agentIndex, depth, gameState, max_depth):
     new_state = gameState.copy()
     agents = new_state.getAgents()
     if new_state.is_win() or new_state.is_lose() or depth == max_depth:
@@ -61,8 +59,7 @@ def alphabeta(agentList, agentIndex, depth, gameState, alpha, beta):
             pacman = Luffy.Pacman(action[0], action[1])
             backup_state = new_state.copy()
             new_state.update(pacman, agentIndex, depth)
-            value = max(value, alphabeta(agents, 1, depth, new_state, alpha, beta))
-            alpha = max(alpha, value)
+            value = max(value, alphabeta(1, depth, new_state, max_depth))
 
             del new_state
             new_state = backup_state.copy()
@@ -81,12 +78,10 @@ def alphabeta(agentList, agentIndex, depth, gameState, alpha, beta):
         res = path[-2]
         ghost = Marine.Ghost(res[0], res[1])
         new_state.update(ghost, agentIndex)
-        value = min(value, alphabeta(agents, nextAgent, depth, new_state, alpha, beta))
-        beta = min(beta, value)
+        value = min(value, alphabeta(nextAgent, depth, new_state, max_depth))
         return value
 
-
-def Level4(map_input):
+def Level4(map_input, max_depth):
     global score
     map = map_input[0]
     pac_pos = map_input[1]
@@ -127,22 +122,18 @@ def Level4(map_input):
             if event.type == pygame.QUIT:
                 running = False
         if init_state.is_lose():
-            print("lost")
             lost_check = True
-            continue
         if not victory_check and not lost_check:
             state_recusive = init_state.copy()
             backup_state = init_state.copy()
             agents = init_state.getAgents()
             agent = agents[agentIndex]
-
             marine_pos = []
-            alpha = -999999
-            beta = 999999
 
             screen.blit(game_bg, (0, 0))
             Map.create_map(map, screen, CELL_SIZE)
             action_scores = []
+            
             if agentIndex == 0:
                 for x in agents[1:]:
                     pos = x.get_pos()
@@ -150,11 +141,12 @@ def Level4(map_input):
                 PosibleActions = getObservation(agent.get_pos(), wall, marine_pos)
                 for action in PosibleActions:
                     state_recusive.update(Luffy.Pacman(action[0], action[1]), 0)
-                    action_scores.append(alphabeta(agents, 1, 0, state_recusive, alpha, beta))
+                    action_scores.append(alphabeta(1, 0, state_recusive, max_depth))
                     state_recusive = backup_state.copy()
                 
                 if len(action_scores)==0:
-                    lost_check =True
+                    lost_check = True
+                    print('gg')
                     continue
                 max_action = max(action_scores)
                 max_indices = [index for index in range(len(action_scores)) if action_scores[index] == max_action]
@@ -190,11 +182,14 @@ def Level4(map_input):
                     pygame.display.update()
             agentIndex = (agentIndex + 1) % numAgents
             time.sleep(0.001)
-        elif victory_check:
+        if victory_check:
             text = get_font(50).render(f"Score: {score}", True, BLACK)
             screen.blit(text, (60, 500))
             victory_state(screen)
             pygame.display.update()
-        elif lost_check:
+        if lost_check:
             lost_state(screen)
             pygame.display.update()
+    pygame.quit()
+    sys.exit()
+    
