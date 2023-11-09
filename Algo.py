@@ -116,7 +116,6 @@ def UCS(maze, start, goal):
     while open_list:
         open_list.sort(key = key_function)
         current_node = open_list[0]
-        print((current_node.x,current_node.y))
         if current_node.x == goal[0] and current_node.y == goal[1]:
             return reconstruct_path(current_node)
         
